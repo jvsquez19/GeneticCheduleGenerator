@@ -6,7 +6,7 @@ namespace GeneticCheduleGenerator
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Hola, how are usted? ");
         }
     }
 }
