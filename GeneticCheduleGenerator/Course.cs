@@ -3,10 +3,10 @@ namespace GeneticCheduleGenerator
 {
     public class Course
     {
-        private string name;
-        private int group;
-        private int idCourse;
-        private int idProfessor;
+        public string name;
+        public int group;
+        public int idCourse;
+        public int idProfessor;
 
         public Course(string n, int idC, int idP, int gr)
         {

@@ -4,8 +4,8 @@ namespace GeneticCheduleGenerator
     public class Schedule
     {
         // no le veo la funcionalidad
-        private string name { get; set; }
-        private int idProfessor { get; set; }
-        private int assignedHours { get; set; }
+        public string name { get; set; }
+        public int idProfessor { get; set; }
+        public int assignedHours { get; set; }
     }
 }

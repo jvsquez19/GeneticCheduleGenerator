@@ -35,7 +35,8 @@ namespace GeneticCheduleGenerator
             Professor p11 = new Professor("Erick Salas", 11, 40);
             Professor p12 = new Professor("Oscar Viquez", 12, 40);
             Professor p13 = new Professor("Jorge Velasco", 13, 40);
-            professors = new List<Professor> { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 };
+            professors = new List<Professor> { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 ,p13};
+
 
             //semestre 1
             Course c1 = new Course("Fundamentos de computacion", 1, 1,50);

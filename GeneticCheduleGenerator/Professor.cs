@@ -6,9 +6,9 @@ namespace GeneticCheduleGenerator
 {
     public class Professor
     {
-        private string name;
-        private int idProfessor;
-        private int assignedHours;
+        public string name;
+        public int idProfessor;
+        public int assignedHours;
         
         public Professor(string n, int id, int assig)
         {
