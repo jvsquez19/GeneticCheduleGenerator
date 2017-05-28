@@ -10,11 +10,8 @@ namespace GeneticCheduleGenerator
         /// en la segunda dimension se encuentran las horas de clases (7am a 9pm) y por ultimo,
         /// en la tercer dimension se encuentra el aula en la cual se imparte el curso
         /// </summary>
-        public static Course[][][] horario1;
-        public static Course[][][] horario2;
         public static List<Course> padre = new List<Course>();
         public static List<Course> madre = new List<Course>();
-
         public static List<Course> hijo = new List<Course>();
         public static List<Course> hija = new List<Course>();
 
@@ -23,9 +20,6 @@ namespace GeneticCheduleGenerator
         /// </summary>
         public static void CrossWithPMX()
         {
-            int numAulas = 0;
-            numAulas = horario1[5][5].Length;
-
             Course course; // save element obtained in a position x
             List<Course> backUp = new List<Course>(); 
             Random rnd = new Random();
@@ -36,18 +30,14 @@ namespace GeneticCheduleGenerator
                 crossPoint = rnd.Next(padre.Count);
 
             int cantToSelec = rnd.Next(1,padre.Count - crossPoint); // number of items to select
-
-            hijo = padre;
-            hija = madre;
-
+            
             for (int i = crossPoint; i < cantToSelec + crossPoint; i++) // realiza el cruce genetico
             {
                 course = hijo[i];
                 hijo[i] = hija[i];
                 hija[i] = course;
             }
-            choques(crossPoint,cantToSelec);
-            
+            choques(crossPoint,cantToSelec);            
         }
         /// <summary>
         /// Repara los choques existentes
@@ -60,27 +50,33 @@ namespace GeneticCheduleGenerator
             for (int i = croPo; i < hijo.Count; i++) // comparo los elementos seleccionados (cruzados) para ver si hay algun error y corregirlo
             {
                 for (int j = 0; j < hijo.Count; j++)
-                { 
-                    if ((j < croPo | j > croPo + cant) & hijo[j].Equals(hijo[i])) // si el elemento esta repetido pero es diferente al que se encuentra en la posicion i quiere decir que hay 
-                    {                                   // mas de 1 y si hay mas de 1 de ese tipo de curso quiere decir que esta ahi por el cruce realizado
-                       vecesHijo++;
-                        if (vecesHijo > hijo[i].lections)
-                        {
-                            for (int o = croPo; o < hija.Count; o++)
+                {
+                    if (hijo[j] != null)
+                    {
+                        if ((j < croPo | j > croPo + cant) & hijo[j].Equals(hijo[i])) // si el elemento esta repetido pero es diferente al que se encuentra en la posicion i quiere decir que hay 
+                        {                                   // mas de 1 y si hay mas de 1 de ese tipo de curso quiere decir que esta ahi por el cruce realizado
+                            vecesHijo++;
+                            if (vecesHijo > hijo[i].lections)
                             {
-                                for (int n = 0; n < hija.Count; n++)
+                                for (int o = croPo; o < hija.Count; o++)
                                 {
-                                    if ((j < croPo | j > croPo + cant) & hija[n].Equals(hija[o]))
+                                    for (int n = 0; n < hija.Count; n++)
                                     {
-                                        vecesHija++;
-                                        if (vecesHija > hija[o].lections)
+                                        if (hija[n] != null)
                                         {
-                                            hijo[j] = hija[n];
-                                            hija[n] = hijo[i];
+                                            if ((j < croPo | j > croPo + cant) & hija[n].Equals(hija[o]))
+                                            {
+                                                vecesHija++;
+                                                if (vecesHija > hija[o].lections)
+                                                {
+                                                    hijo[j] = hija[n];
+                                                    hija[n] = hijo[i];
+                                                }
+                                            }
                                         }
-                                    }
-                                }// end for
-                            }// end for                           
+                                    }// end for
+                                }// end for                           
+                            }
                         }
                     }
                 }// end for
@@ -89,9 +85,57 @@ namespace GeneticCheduleGenerator
 
         public static void Main(string[] args)
         {
-            // horario1 = creaarhorario();
-            // padre = toList(horario1);
-            // madre = toList(horario2);
+            //horario1 = creaarhorario();
+            //padre = toList(horario1);
+            //madre = toList(horario2);
+            /*Console.ReadKey();
+            Console.WriteLine("Iniciando");
+            DefaultData.InsertDefaultData();
+            Schedule parent1 = new Schedule();
+            List<Course> seed = parent1.prepareListForCreate(DefaultData.courses);
+            parent1.createParent(seed);
+            String[] days = new string[]{ "lunes", "martes", "miercoles", "jueves", "viernes" };
+            String[] hours = new string[]{ "7 a 9", "9:10 a 11:10", "12:10 a 2:10", "2:20 a 4:20" };
+
+            for (int i = 0; i < 5; i++)
+            {
+                Console.WriteLine(days[i]);
+                for (int j = 0; j < 4; j++)
+                {
+                    Console.WriteLine(hours[j]);
+                    for (int k = 0; k < Schedule.aulas; k++)
+                    {
+                        if (parent1.matrix[i, j, k] != null)
+                        {
+                            Console.WriteLine(parent1.matrix[i, j, k].name + "Aula" + k);
+                        }
+                    }
+                }
+            }*/
+            DefaultData.InsertDefaultData();
+            Schedule parent1 = new Schedule();
+            Schedule parent2 = new Schedule();
+            padre = parent1.matrixToList();
+            madre = parent2.matrixToList();
+
+            hijo = parent1.matrixToList();
+            hija = parent2.matrixToList();
+
+            CrossWithPMX();
+            for (int i = 0; i < padre.Count; i++)
+            {
+                if(padre[i] != null)
+                    Console.Write(" |"+padre[i].idCourse+"|");
+            }
+            Console.WriteLine("\n");
+            for (int i = 0; i < hijo.Count; i++)
+            {
+                if (hijo[i] != null)
+                    Console.Write(" |" + hijo[i].idCourse + "|");
+            }
+            Console.WriteLine(hijo.Count + ", " + hija.Count);
+            parent1.listToMatrix(padre);
+            parent2.listToMatrix(madre);
 
             Console.ReadKey();
         }
