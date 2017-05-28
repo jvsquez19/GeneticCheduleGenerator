@@ -7,7 +7,7 @@ namespace GeneticCheduleGenerator
     {
         static int aulas = 10;
 
-        private Course[,,] matrix = new Course[5,4,aulas];
+        private Course[,,] matrix = new Course[5,4,aulas]; // days, hours (1 space in the matrix is equal to 2 hours and 15 minutes)
 
 
         // Generates a one dimension list from the matrix 
@@ -23,7 +23,6 @@ namespace GeneticCheduleGenerator
 					for (int k = 0; k < aulas; k++)
 					{
                         response.Add(matrix[i,j,k]);
-
 					}
 				}
 			}
@@ -43,7 +42,6 @@ namespace GeneticCheduleGenerator
 					{
                         matrix[i, j, k] = list[count];
                         count++;
-
 					}
 				}
 			}
@@ -65,8 +63,7 @@ namespace GeneticCheduleGenerator
                     }   
                 }
             }
-            return false;   
-
+            return false;  
         }
 
 		public bool IsSemesterCrushes(int semester, int day, int hour)
@@ -85,5 +82,21 @@ namespace GeneticCheduleGenerator
 			}
 			return false;
 		}
+        public bool IsCourseCrushes(int semester, int day, int hour)
+        {
+            for (int i = 0; i < aulas; i++)
+            {
+                Course actual = matrix[day, hour, i];
+
+                if (actual != null)
+                {
+                    if (actual.semester == semester)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 }

@@ -10,9 +10,9 @@ namespace GeneticCheduleGenerator
         public int idProfessor;
         public int assignedHours;
         
-        public Professor(string n, int id, int assig)
+        public Professor(string name, int id, int assig)
         {
-            this.name = n;
+            this.name = name;
             this.idProfessor = id;
             this.assignedHours = assig;
         }
