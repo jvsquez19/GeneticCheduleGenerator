@@ -12,13 +12,13 @@ namespace GeneticCheduleGenerator
         /// </summary>
         public static List<Course> padre = new List<Course>();
         public static List<Course> madre = new List<Course>();
-        public static List<Course> hijo = new List<Course>();
+        public static List<Course> hijo;// = new List<Course>();
         public static List<Course> hija = new List<Course>();
 
         /// <summary>
         /// Function that cross two parents and be obtained two son
         /// </summary>
-        public static void CrossWithPMX()
+        public static void CrossWithPMX(ref List<Course> hijo, ref List<Course> hija)
         {
             Course course; // save element obtained in a position x
             List<Course> backUp = new List<Course>(); 
@@ -37,13 +37,13 @@ namespace GeneticCheduleGenerator
                 hijo[i] = hija[i];
                 hija[i] = course;
             }
-            choques(crossPoint,cantToSelec);            
+            choques(crossPoint,cantToSelec, ref hijo, ref hija);            
         }
         /// <summary>
         /// Repara los choques existentes
         /// </summary>
         /// <param name="croPo">Cross Point</param>
-        public static void choques(int croPo, int cant)
+        public static void choques(int croPo, int cant, ref List<Course> hijo, ref List<Course> hija)
         {
             int vecesHijo = 0, vecesHija = 0; // cantidad de veces que aparece el obj
 
@@ -64,7 +64,7 @@ namespace GeneticCheduleGenerator
                                     {
                                         if (hija[n] != null)
                                         {
-                                            if ((j < croPo | j > croPo + cant) & hija[n].Equals(hija[o]))
+                                            if ((n < croPo | n > croPo + cant) & hija[n].Equals(hija[o]))
                                             {
                                                 vecesHija++;
                                                 if (vecesHija > hija[o].lections)
@@ -80,11 +80,12 @@ namespace GeneticCheduleGenerator
                         }
                     }
                 }// end for
-            }// end for            
+            }// end for   
         }
 
         public static void Main(string[] args)
         {
+            Console.WriteLine(124%40.0+"\n\n");
             //horario1 = creaarhorario();
             //padre = toList(horario1);
             //madre = toList(horario2);
@@ -117,23 +118,33 @@ namespace GeneticCheduleGenerator
             Schedule parent2 = new Schedule();
             padre = parent1.matrixToList();
             madre = parent2.matrixToList();
+            
+            hijo = padre;
+            //hijo = padre;
 
-            hijo = parent1.matrixToList();
             hija = parent2.matrixToList();
 
-            CrossWithPMX();
             for (int i = 0; i < padre.Count; i++)
             {
                 if(padre[i] != null)
-                    Console.Write(" |"+padre[i].idCourse+"|");
+                    Console.Write(" "+padre[i].idCourse);
+            }
+
+            CrossWithPMX(ref hijo, ref hija);
+            
+            /*Console.WriteLine("\n");
+            for (int i = 0; i < madre.Count; i++)
+            {
+                if (madre[i] != null)
+                    Console.Write(" " + madre[i].idCourse);
             }
             Console.WriteLine("\n");
-            for (int i = 0; i < hijo.Count; i++)
+            for (int i = 0; i < hija.Count; i++)
             {
-                if (hijo[i] != null)
-                    Console.Write(" |" + hijo[i].idCourse + "|");
-            }
-            Console.WriteLine(hijo.Count + ", " + hija.Count);
+                if (hija[i] != null)
+                    Console.Write(" " + hija[i].idCourse);
+            }*/
+            //Console.WriteLine(hijo.Count + ", " + hija.Count);
             parent1.listToMatrix(padre);
             parent2.listToMatrix(madre);
 
