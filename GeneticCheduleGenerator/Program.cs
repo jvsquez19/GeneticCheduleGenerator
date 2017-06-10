@@ -14,8 +14,8 @@ namespace GeneticCheduleGenerator
         public static List<Course> madre = new List<Course>();
         public static List<Course> hijo;// = new List<Course>();
         public static List<Course> hija;
-
-
+        public static List<Course> bestSon;
+        float bestFitness = 0;
 
         public static void Main(string[] args)
         {
@@ -24,10 +24,7 @@ namespace GeneticCheduleGenerator
             
             Schedule parent1 = new Schedule();
             padre =  new List<Course>(parent1.MatrixToList()); // punto debug aqui
-
-            List<Course> parent1list = parent1.MatrixToList();
-            parent1.ListToMatrix(parent1list);
-            
+                        
             hijo = new List<Course>(padre);
 
             Schedule parent2 = new Schedule();
@@ -35,19 +32,41 @@ namespace GeneticCheduleGenerator
             madre = new List<Course>(parent2.MatrixToList());
                         
             hija = new List<Course>(madre);
+
+            parent1.GeneticPMX();
+            /*=    =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =
             Console.WriteLine("---------------- PMX genetic algorithm ----------------\n");
             Schedule.PrintList(hijo, "Padre 1");
             Console.WriteLine();
             Schedule.PrintList(hija, "Padre 2");
-
-            Schedule.CrossWithPMX(hijo, hija, ref asig, ref comp);
+            */
+            Schedule.CrossWithPMX(hijo, hija, ref asig, ref comp);  // llamada al algoritmo PMX
             Console.WriteLine("\n\nCantidad de asignaciones: {0}, cantidad de compraciones: {1}", asig, comp);
 
             parent1.ListToMatrix(hijo);
             parent2.ListToMatrix(hija);
 
-            /*parent1.FixIfThereIsCrash();
-            parent2.FixIfThereIsCrash();*/
+            parent1.Mutations();
+            parent2.Mutations();
+
+            Schedule.printSchedule(parent1.matrix);
+            Schedule.printSchedule(parent2.matrix);
+
+            //Console.WriteLine("\n\nCantidad de asignaciones: {0}, cantidad de compraciones: {1}", asig, comp);
+
+            /*
+            Console.WriteLine("\n--------------- Hijo 1 ---------------");
+            Schedule.PrintList(hijo, "Hijo 1");
+
+            Console.WriteLine();
+
+            Console.WriteLine("\n--------------- Hijo 2 ---------------");
+            Schedule.PrintList(hija, "Hijo 2");
+            */
+            Schedule.printSchedule(parent1.matrix);
+            Schedule.printSchedule(parent2.matrix);
+
+            /*=    =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =   =*/
 
             Console.ReadKey();
             asig = 0;
@@ -56,21 +75,24 @@ namespace GeneticCheduleGenerator
             // reseteo los mismos padres que se enviaron al PMX para que usen los mismos horarios padre
             hijo = new List<Course>(padre);
             hija = new List<Course>(madre);
-            Console.WriteLine("---------------- OX genetic algorithm ----------------\n");
+            Console.WriteLine("\n\n---------------- OX genetic algorithm ----------------\n");
                         
             Schedule.PrintList(hijo, "Padre 1");
             Console.WriteLine();
             Schedule.PrintList(hija, "Padre 2");
 
-            Schedule.OrderOneCrossover(hijo, hija, ref asig, ref comp);
+            Schedule.OrderOneCrossover(hijo, hija, ref asig, ref comp); // llamada a OX
+
             Console.WriteLine("\n\nCantidad de asignaciones: {0}, cantidad de compraciones: {1}", asig, comp);
 
             parent1.ListToMatrix(hijo);
+            parent1.Mutations();
+            Schedule.printSchedule(parent1.matrix);
+
             parent2.ListToMatrix(hija);
-
-            parent1.FixIfThereIsCrash();
-            parent2.FixIfThereIsCrash();
-
+            parent2.Mutations();
+            Schedule.printSchedule(parent2.matrix);
+            
             Console.ReadKey();            
         }
     }

@@ -14,7 +14,6 @@ namespace GeneticCheduleGenerator
 
         public Schedule()
         {
-
             List<Course> seed = PrepareListForCreate(DefaultData.courses);
             CreateParent(seed);
         }        
@@ -104,13 +103,6 @@ namespace GeneticCheduleGenerator
             }
             comp++;
             Crashes(crossPoint, cantToSelec, hijo, hija, ref asig, ref comp);
-            Console.WriteLine("\n--------------- Hijo 1 ---------------");
-            PrintList(hijo, "Hijo 1");
-            Console.WriteLine();
-
-            Console.WriteLine("\n--------------- Hijo 2 ---------------");
-            PrintList(hija, "Hijo 2");
-            //Console.WriteLine("\n\nCantidad de asignaciones: {0}, cantidad de compraciones: {1}", asig, comp);
         }
 
         /// <summary>
@@ -234,6 +226,15 @@ namespace GeneticCheduleGenerator
             comp++;
             //Console.WriteLine("\n\nCantidad de asignaciones: {0}, cantidad de compraciones: {1}", asig, comp);
         }
+
+        public void GeneticPMX(List<Course> hijo, List<Course> hija)
+        {
+            int comp = 0, asig = 0;
+            for (int i = 0; i < 10; i++) // cantidad de generaciones
+            {
+                Schedule.CrossWithPMX(hijo, hija, ref asig, ref comp);
+            }
+        }
         /// <summary>
         /// Genetic Algorithm named Order One Crossover
         /// </summary>
@@ -281,9 +282,9 @@ namespace GeneticCheduleGenerator
 
             Console.WriteLine("\n--------------- Hijo 1 ---------------\n");
             FillOX(crossPoint, cantToSelec, hijo1, padre2, ref asig, ref comp);
-            PrintList(hijo1, "Hijo 1");            
             
-
+            PrintList(hijo1, "Hijo 1");         
+            
             asig = 0;
             comp = 0;
 
@@ -292,11 +293,12 @@ namespace GeneticCheduleGenerator
             PrintList(hijo2, "Hijo 2");
 
             padre1 = hijo1;
-            padre2 = hijo2;
-            
+            padre2 = hijo2;            
         }
-
-        public void FixIfThereIsCrash()
+        /// <summary>
+        /// Mutation Function
+        /// </summary>
+        public void Mutations()
         {
             Random rnd = new Random();
             bool listo = false;
@@ -323,9 +325,10 @@ namespace GeneticCheduleGenerator
                                         for (int f = 0; f < aulas; f++)
                                         {
                                             if (matrix[d, e, f] == null)
-                                                if (matrix[d, e, f].idProfessor.Equals(profesor) & matrix[d, e, f].semester == matrix[a, b, c].semester & matrix[d, e, f].Equals(crashCourse))
-                                                {
+                                                if (!IsProfessorCrushes(crashCourse.idProfessor, d, e) & !IsSemesterCrushes(crashCourse.semester, crashCourse.groupe, d, e))
+                                                { 
                                                     matrix[d, e, f] = crashCourse;
+                                                    Console.WriteLine("Mutando curso#"+crashCourse.idCourse+" a posicion #["+d+", "+e+", "+f+"]\n");
                                                     matrix[a, b, c] = null;
                                                     listo = true;
                                                     break;
@@ -405,8 +408,8 @@ namespace GeneticCheduleGenerator
                     hijo1[pos] = hijo2[i];
                     if (hijo2[i] != null)
                         Console.WriteLine("Colocando curso #" + hijo2[i].idCourse + " en la posicion #" + pos);
-                    else
-                        Console.WriteLine("Colocando un espacio (null) en la posicion #" + pos);
+                    //else
+                        //Console.WriteLine("Colocando un espacio (null) en la posicion #" + pos);
                     pos++;
 
                     veces = 0;
@@ -550,7 +553,7 @@ namespace GeneticCheduleGenerator
 		public static void printSchedule(Course[,,] matrix)
 		{
 			String[] days = new string[] { "lunes", "martes", "miercoles", "jueves", "viernes" };
-			String[] hours = new string[] { "7 a 9", "9:10 a 11:10", "12:10 a 2:10", "2:20 a 4:20" };
+			String[] hours = new string[] { "\n7:00 a 9:15", "\n9:15 a 11:30", "\n12:30 a 2:45", "\n2:45 a 4:30" };
 
 			for (int i = 0; i < 5; i++)
 			{
