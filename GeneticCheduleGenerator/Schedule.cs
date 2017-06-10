@@ -58,6 +58,24 @@ namespace GeneticCheduleGenerator
 				}
 			}
         }
+
+		public Course[,,] ListToMatrixR(List<Course> list)
+		{
+            Course[,,] response = new Course[5, 4, aulas];
+			int count = 0;
+			for (int i = 0; i < 5; i++)
+			{
+				for (int j = 0; j < 4; j++)
+				{
+					for (int k = 0; k < aulas; k++)
+					{
+                        response[i, j, k] = list[count];
+						count++;
+					}
+				}
+			}
+            return response;
+		}
         
         /// <summary>
         /// Print a received list
@@ -232,9 +250,57 @@ namespace GeneticCheduleGenerator
             int comp = 0, asig = 0;
             for (int i = 0; i < 10; i++) // cantidad de generaciones
             {
-                Schedule.CrossWithPMX(hijo, hija, ref asig, ref comp);
+               CrossWithPMX(hijo, hija, ref asig, ref comp);
+                Course[,,] hijom = ListToMatrixR(hijo);
+                Course[,,] hijam = ListToMatrixR(hija);
+                float aFit = getFitness(hijam);
+                float oFit = getFitness(hijom);
+                if(aFit>bestFit)
+                {
+                    bestFit = aFit;
+                    best = Clone(hijam);
+
+                }
+                if (oFit>bestFit)
+                {
+                    bestFit = oFit;
+                    best = Clone(hijom);
+
+                }
+
             }
+
         }
+
+
+		public void GeneticOX(List<Course> hijo, List<Course> hija)
+		{
+			int comp = 0, asig = 0;
+			for (int i = 0; i < 10; i++) // cantidad de generaciones
+			{
+                OrderOneCrossover(hijo, hija, ref asig, ref comp);
+				Course[,,] hijom = ListToMatrixR(hijo);
+				Course[,,] hijam = ListToMatrixR(hija);
+				float aFit = getFitness(hijam);
+				float oFit = getFitness(hijom);
+				if (aFit > bestFit)
+				{
+					bestFit = aFit;
+					best = Clone(hijam);
+
+				}
+				if (oFit > bestFit)
+				{
+					bestFit = oFit;
+					best = Clone(hijom);
+
+				}
+
+			}
+
+		}
+
+
         /// <summary>
         /// Genetic Algorithm named Order One Crossover
         /// </summary>
@@ -488,9 +554,6 @@ namespace GeneticCheduleGenerator
 		/// <summary>
 		/// Function that evaluates if there is a clash of semesters
 		/// </summary>
-		/// <param name="semester"></param>
-		/// <param name="day"></param>
-		/// <param name="hour"></param>
 		/// <returns></returns>
         public Course[,,] Clone()
         {
@@ -507,6 +570,22 @@ namespace GeneticCheduleGenerator
             }
             return response;
         }
+
+		public Course[,,] Clone(Course[,,] toCopy)
+		{
+			Course[,,] response = new Course[5, 4, aulas];
+			for (int i = 0; i < 5; i++)
+			{
+				for (int j = 0; j < 4; j++)
+				{
+					for (int a = 0; a < aulas; a++)
+					{
+                        response[i, j, a] = toCopy[i, j, a];
+					}
+				}
+			}
+			return response;
+		}
 
         /// <summary>
         /// Function that evaluates if there is a crash of semesters
@@ -608,7 +687,7 @@ namespace GeneticCheduleGenerator
 		/// <summary>
 		/// Iterates a Matrix and returns the fitness.
 		/// </summary>
-		/// <param name="seed">List with all courses to assign</param>
+
 		public float getFitness()
         {
             float fit = 1;
@@ -640,6 +719,38 @@ namespace GeneticCheduleGenerator
             }
             return fit;
         }
+
+		public float getFitness(Course[,,] toEvaluate)
+		{
+			float fit = 1;
+			float penalty = (float)0.05;
+			for (int i = 0; i < 5; i++)
+			{
+				List<Course> FoundCourses = new List<Course>();
+				for (int j = 0; j < 4; j++)
+				{
+					for (int a = 0; a < aulas; a++)
+					{
+						for (int aux = 0; aux < FoundCourses.Count; aux++)
+						{
+							if (matrix[i, j, a] != null)
+							{
+                                if (FoundCourses[aux].Equals(toEvaluate[i, j, a]))
+								{
+									fit -= penalty;
+									break;
+								}
+							}
+						}
+						if (matrix[i, j, a] != null)
+							FoundCourses.Add(matrix[i, j, a]);
+					}
+				}
+
+
+			}
+			return fit;
+		}
         
         public void CleanMatrix()
         {
@@ -660,96 +771,142 @@ namespace GeneticCheduleGenerator
 		/// Brand and Bounds method that explores all the posibilities.
 		/// </summary>
 		/// <param name="seed">List with all courses to assign</param>
-		public void BrandAndBoundAux(List<Course> seed, int day, int hour, int aula, ref long comp, ref long asig)
+		public void BrandAndBoundAux(List<Course> seed, int day, int hour, int aula, ref long comp, ref long asig, ref int iterations, ref int bounds)
         {
+
+            comp++;
+            if(iterations >= 10000)
+                return;
+            
 			if (seed.Count == 0)
 			{
                 asig++;
                 float fit = getFitness();
+                comp++;
 				if (fit > bestFit)
 				{
                     asig += 203;
 					best = Clone();
                     bestFit = fit;
-                    Console.WriteLine("NUEVO MEJOR \n" + "FIT: " + fit + "\n" + "BESTFIT: " + bestFit+"\n");
-                    printSchedule(best);
+                    //Console.WriteLine("NUEVO MEJOR \n" + "FIT: " + fit + "\n" + "BESTFIT: " + bestFit+"\n");
+                    //printSchedule(best);
                     Console.WriteLine();
-                    long totalBytesOfMemoryUsed = currentProcess.WorkingSet64;
-					
-
-
+                    iterations = 0;
 					return;
 				}
-				else
-				{
                     
-					Console.WriteLine("DESCARTADO \n" + "FIT: " + fit + "\n" + "BESTFIT: " + bestFit + "\n");
-					printSchedule(matrix);
+					//Console.WriteLine("DESCARTADO \n" + "FIT: " + fit + "\n" + "BESTFIT: " + bestFit + "\n");
+                    iterations++;
+					//printSchedule(matrix);
                     return;
-				}
 
 			}
+            comp++;
 			if (((day == 4) && (hour == 3)) && (aula == aulas-1))
 			{
+                comp++;
                 if(seed.Count == 1)
                 {
                     Course actual = seed[0];
+                    comp++;
                     if (!IsSemesterCrushes(actual.semester,actual.groupe, day, hour) && (!IsProfessorCrushes(actual.idProfessor, day, hour)))
                     {
+                        asig++;
                         matrix[day, hour, aula] = actual;
                         seed.RemoveAt(0);
-                        BrandAndBoundAux(seed, day, hour, aula, ref comp, ref asig);
+                        BrandAndBoundAux(seed, day, hour, aula, ref comp, ref asig, ref iterations, ref bounds);
                         matrix[day, hour, aula] = null;
+                        asig++;
                         seed.Add(actual);
                     }
                     return;
 
                 }
-                else
                 return;
 			}
-
+            comp++;
 			if (aula == aulas)
 			{
+                asig++;
 				aula = 0;
 				hour++;
 			}
-
+            comp++;
 			if (hour == 4)
 			{
+                asig++;
 				hour = 0;
 				day++;
 			}
-
+            comp++;
             for (int i = 0; i < seed.Count; i++)
             {
+                comp++;
                 Course actual = seed[0];
                 seed.RemoveAt(0);
-                if(!IsSemesterCrushes(actual.semester,actual.groupe,day,hour)&&(!IsProfessorCrushes(actual.idProfessor,day,hour)))
+                comp+=2;
+                if (!IsSemesterCrushes(actual.semester, actual.groupe, day, hour) && (!IsProfessorCrushes(actual.idProfessor, day, hour)))
                 {
                     matrix[day, hour, aula] = actual;
-                    BrandAndBoundAux(seed, day, hour, aula + 1, ref comp, ref asig);
+                    BrandAndBoundAux(seed, day, hour, aula + 1, ref comp, ref asig, ref iterations, ref bounds);
+                    if (iterations >= 10000)
+                    {
+                        break;
+                    }
                     matrix[day, hour, aula] = null;
-
+                    asig++;
 
                 }
+                else
+                    bounds++;
+                    
                 seed.Add(actual);
+                comp++;
                 if (bestFit == 1)
                     return;
+				if (iterations >= 10000)
+				{
+					break;
+				}
 
 
             }
-            BrandAndBoundAux(seed, day, hour, aula + 1, ref comp, ref asig);
-        }
-        
+
+            BrandAndBoundAux(seed, day, hour, aula + 1, ref comp, ref asig, ref iterations, ref bounds);
+       }
+
+
         public void BrandAndBound()
         {
-            
+            int bounds = 0;
+            int iterations = 0;
             long asig = 0, comp = 0;
             
 			List<Course> seed = PrepareListForCreate(DefaultData.courses);
+            Shuffle(seed);
 			CleanMatrix();
-			BrandAndBoundAux(seed, 0, 0, 0, ref asig, ref comp);
+            BrandAndBoundAux(seed, 0, 0, 0, ref asig, ref comp, ref iterations, ref bounds);
+            Console.WriteLine("PODAS: "+bounds+ " Comparaciones: "+comp +" Asig: "+asig+"\n");
+            Console.WriteLine("FITNESS:"+bestFit+"\n");
+            printSchedule(best);
+			long totalBytesOfMemoryUsed = currentProcess.WorkingSet64;
+            Console.WriteLine("MEMORIA UTILIZADA: " + totalBytesOfMemoryUsed / 1048576.0);
         }
+
+		 
+
+        public static void Shuffle<Course>(List<Course> list)
+		{
+            Random rng = new Random();
+			int n = list.Count;
+			while (n > 1)
+			{
+				n--;
+				int k = rng.Next(n + 1);
+				Course T = list[k];
+				list[k] = list[n];
+				list[n] = T;
+			}
+		}
     }
 }
