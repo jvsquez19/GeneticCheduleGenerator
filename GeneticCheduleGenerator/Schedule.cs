@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace GeneticCheduleGenerator
@@ -6,12 +6,26 @@ namespace GeneticCheduleGenerator
     public class Schedule
     {
         public static int aulas = 10;
+<<<<<<< HEAD
         public Course[,,] matrix = new Course[5,4,aulas];// days, hours (1 space in the matrix is equal to 2 hours and 15 minutes)
 
         public Schedule()
         {
+<<<<<<< HEAD
             List<Course> seed = PrepareListForCreate(DefaultData.courses);
             CreateParent(seed);
+=======
+            List<Course> seed = prepareListForCreate(DefaultData.courses);
+            createParent(seed);
+=======
+        public Course[,,] matrix = new Course[5,4,aulas];
+
+        public Schedule()
+        {
+			List<Course> seed = prepareListForCreate(DefaultData.courses);
+			createParent(seed);
+>>>>>>> eef9061... little changes
+>>>>>>> df21e4e... little changes
         }
         /// <summary>
         /// Generates a list respect to a matrix
@@ -33,11 +47,22 @@ namespace GeneticCheduleGenerator
 			}
             return response;
         }
+<<<<<<< HEAD
         /// <summary>
         /// Converts a received matrix into a list
         /// </summary>
         /// <param name="list">List to convert</param>
+<<<<<<< HEAD
         public void ListToMatrix(List<Course>list)
+=======
+        public void listToMatrix(List<Course>list)
+=======
+
+
+        // converts a received matrix into a list
+        public  void listToMatrix(List<Course>list)
+>>>>>>> 55a4a10... little changes
+>>>>>>> df21e4e... little changes
         {
             int count = 0;
 			for (int i = 0; i < 5; i++)
@@ -412,7 +437,11 @@ namespace GeneticCheduleGenerator
                     }   
                 }
             }
+<<<<<<< HEAD
             return false;  
+=======
+            return false;   
+>>>>>>> eef9061... little changes
         }
         /// <summary>
         /// Function that evaluates if there is a clash of semesters

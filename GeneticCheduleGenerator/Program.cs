@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace GeneticCheduleGenerator
@@ -22,7 +22,14 @@ namespace GeneticCheduleGenerator
             DefaultData.InsertDefaultData();
             
             Schedule parent1 = new Schedule();
+<<<<<<< HEAD
             padre =  new List<Course>(parent1.MatrixToList());
+=======
+            List<Course> parent1list = parent1.matrixToList();
+            parent1.listToMatrix(parent1list);
+            String[] days = new string[]{ "lunes", "martes", "miercoles", "jueves", "viernes" };
+            String[] hours = new string[]{ "7 a 9", "9:10 a 11:10", "12:10 a 2:10", "2:20 a 4:20" };
+>>>>>>> df21e4e... little changes
 
             hijo = new List<Course>(padre);
 
