@@ -8,16 +8,16 @@ namespace GeneticCheduleGenerator
         public int idCourse; //{ get; set; }
         public Professor idProfessor; //{ get; set; }
         public int lections; //{ get; set; }
-        public int group;
+        public int groupe;
 
-        public Course(string name, int idCourse, Professor profe, int group, int semester,int lections)
+        public Course(string name, int idCourse, Professor profe, int groupe, int semester,int lections)
         {
             this.name = name;
             this.idCourse = idCourse;
             this.idProfessor = profe;
             this.semester = semester;
             this.lections = lections;
-            this.group = group;
+            this.groupe = groupe;
         }
     }
 }

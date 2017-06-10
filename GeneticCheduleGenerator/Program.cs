@@ -16,6 +16,7 @@ namespace GeneticCheduleGenerator
         public static List<Course> hija;
 
 
+
         public static void Main(string[] args)
         {
             int asig = 0, comp = 0;
@@ -24,6 +25,9 @@ namespace GeneticCheduleGenerator
             Schedule parent1 = new Schedule();
             padre =  new List<Course>(parent1.MatrixToList()); // punto debug aqui
 
+            List<Course> parent1list = parent1.MatrixToList();
+            parent1.ListToMatrix(parent1list);
+            
             hijo = new List<Course>(padre);
 
             Schedule parent2 = new Schedule();
@@ -36,19 +40,19 @@ namespace GeneticCheduleGenerator
             Console.WriteLine();
             Schedule.PrintList(hija, "Padre 2");
 
-            Schedule.CrossWithPMX(hijo, hija, asig, comp);
+            Schedule.CrossWithPMX(hijo, hija, ref asig, ref comp);
+            Console.WriteLine("\n\nCantidad de asignaciones: {0}, cantidad de compraciones: {1}", asig, comp);
 
             parent1.ListToMatrix(hijo);
             parent2.ListToMatrix(hija);
 
-            Schedule.prin
+            /*parent1.FixIfThereIsCrash();
+            parent2.FixIfThereIsCrash();*/
 
-            parent1.FixIfThereIsCrash();
-            parent2.FixIfThereIsCrash();
-
+            Console.ReadKey();
             asig = 0;
             comp = 0;
-
+            
             // reseteo los mismos padres que se enviaron al PMX para que usen los mismos horarios padre
             hijo = new List<Course>(padre);
             hija = new List<Course>(madre);
@@ -58,17 +62,16 @@ namespace GeneticCheduleGenerator
             Console.WriteLine();
             Schedule.PrintList(hija, "Padre 2");
 
-            Schedule.OrderOneCrossover(hijo, hija, asig, comp);
+            Schedule.OrderOneCrossover(hijo, hija, ref asig, ref comp);
+            Console.WriteLine("\n\nCantidad de asignaciones: {0}, cantidad de compraciones: {1}", asig, comp);
 
             parent1.ListToMatrix(hijo);
             parent2.ListToMatrix(hija);
 
             parent1.FixIfThereIsCrash();
-
             parent2.FixIfThereIsCrash();
-            //Console.WriteLine("\n\nCantidad de asignaciones: {0}, cantidad de compraciones: {1}", asig, comp);
 
-            Console.ReadKey();
+            Console.ReadKey();            
         }
     }
 }
