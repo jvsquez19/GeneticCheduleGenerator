@@ -267,8 +267,8 @@ namespace GeneticCheduleGenerator
 
             Console.WriteLine("\n--------------- Hijo 1 ---------------\n");
             FillOX(crossPoint, cantToSelec, hijo1, padre2, asig, comp);
-            PrintList(hijo1, "Hijo 1");
-
+            PrintList(hijo1, "Hijo 1");            
+            
             Console.WriteLine("\n\nCantidad de asignaciones: {0}, cantidad de compraciones: {1}", asig, comp);
 
             asig = 0;
@@ -278,9 +278,60 @@ namespace GeneticCheduleGenerator
             FillOX(crossPoint, cantToSelec, hijo2, padre1, asig, comp);                                    
             PrintList(hijo2, "Hijo 2");
 
+            padre1 = hijo1;
+            padre2 = hijo2;
+
             Console.WriteLine("\n\nCantidad de asignaciones: {0}, cantidad de compraciones: {1}", asig, comp);
         }
+        public void FixIfThereIsCrash()
+        {
+            Random rnd = new Random();
+            bool listo = false;
+            Course crashCourse;
+            for (int a = 0; a < 5; a++)//dias
+            {
+                for (int b = 0; b < 4; b++)//horas
+                {
+                    listo = false;
+                    for (int c = 0; c < aulas; c++)//aulas
+                    {
+                        if (matrix[a, b, c] != null)
+                        {
+                            Professor profesor = matrix[a, b, c].idProfessor;
+                            if (IsProfessorCrushes(profesor, a, b) | IsSemesterCrushes(matrix[a, b, c].semester, a, b)) // si hay choques de semestre o de profes
+                            {
+                                Console.WriteLine("Choque de profesor o semestre!");
+                                crashCourse = matrix[a, b, c];
 
+                                for (int d = 0; d < 5; d++) // busco null perfecto para meter aqui el curso y que no de choques
+                                {
+                                    for (int e = 0; e < 4; e++)
+                                    {
+                                        for (int f = 0; f < aulas; f++)
+                                        {
+                                            if (matrix[d, e, f] == null)
+                                                if (matrix[d, e, f].idProfessor.Equals(profesor) & matrix[d, e, f].semester == matrix[a, b, c].semester & matrix[d, e, f].Equals(crashCourse))
+                                                {
+                                                    matrix[d, e, f] = crashCourse;
+                                                    matrix[a, b, c] = null;
+                                                    listo = true;
+                                                    break;
+                                                }
+                                        }
+                                        if (listo)
+                                            break;
+                                    }
+                                    if (listo)
+                                        break;
+                                }
+                                if (listo)
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         public static void FillOX(int crossPo, int cantSelect, List<Course> hijo1, List<Course> hijo2, int asig, int comp)
         {
             bool esta = false;
@@ -415,7 +466,7 @@ namespace GeneticCheduleGenerator
             return false;  
         }
         /// <summary>
-        /// Function that evaluates if there is a clash of semesters
+        /// Function that evaluates if there is a crash of semesters
         /// </summary>
         /// <param name="semester"></param>
         /// <param name="day"></param>
@@ -437,23 +488,7 @@ namespace GeneticCheduleGenerator
 			}
 			return false;
 		}
-        /*
-        public bool IsCourseCrushes(int semester, int day, int hour)
-        {
-            for (int i = 0; i < aulas; i++)
-            {
-                Course actual = matrix[day, hour, i];
-
-                if (actual != null)
-                {
-                    if (actual.semester == semester)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }*/
+        
         /// <summary>
         /// Prepare a list by adding same courses depending on the number of lessons
         /// </summary>
