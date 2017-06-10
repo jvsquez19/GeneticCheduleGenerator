@@ -10,14 +10,14 @@ namespace GeneticCheduleGenerator
 
         public Schedule()
         {
-            List<Course> seed = prepareListForCreate(DefaultData.courses);
-            createParent(seed);
+            List<Course> seed = PrepareListForCreate(DefaultData.courses);
+            CreateParent(seed);
         }
         /// <summary>
         /// Generates a list respect to a matrix
         /// </summary>
         /// <returns>List with all elements of the matrix</returns>
-        public List<Course>  matrixToList()
+        public List<Course>  MatrixToList()
         {
             List<Course> response = new List<Course>();
 
@@ -37,7 +37,7 @@ namespace GeneticCheduleGenerator
         /// Converts a received matrix into a list
         /// </summary>
         /// <param name="list">List to convert</param>
-        public void listToMatrix(List<Course>list)
+        public void ListToMatrix(List<Course>list)
         {
             int count = 0;
 			for (int i = 0; i < 5; i++)
@@ -53,41 +53,31 @@ namespace GeneticCheduleGenerator
 			}
         }
 
-        public static void printParent(List<Course> list,int n)
+        public static void PrintList(List<Course> list,string n)
         {
-            Console.Write("\nPadre "+n+": ");
+            Console.Write("\n"+n+": ");
             for (int i = 0; i < list.Count; i++)
             {
                 if (list[i] != null)
                     Console.Write(" " + list[i].idCourse);
             }
         }
-
-        public static void printSon(List<Course> list, int n)
-        {
-            Console.Write("\nHijo " + n + ": ");
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i] != null)
-                    Console.Write(" " + list[i].idCourse);
-            }
-        }
+        
         /// <summary>
         /// Function that cross two parents and be obtained two son
         /// </summary>
-        public static void CrossWithPMX(List<Course> hijo, List<Course> hija, ref int asig, ref int comp)
+        public static void CrossWithPMX(List<Course> hijo, List<Course> hija, int asig, int comp)
         {
-            // save element obtained in a position x
             Random rnd = new Random();
 
-            int crossPoint = rnd.Next(hijo.Count) + 1;  // point to start to select elements of the mutation
+            int crossPoint = rnd.Next(hijo.Count);  // point to start to select elements of the mutation
 
             asig += 2;
             comp++;
             while (crossPoint >= hijo.Count) // el punto de cruce no puede quedar al final porque sino no puede seleccionar una subcadena y por ende no habria nada para intercambiar
-                crossPoint = rnd.Next(hijo.Count) + 1;
+                crossPoint = rnd.Next(hijo.Count);
 
-            int cantToSelec = rnd.Next(1, hijo.Count - crossPoint); // number of items to select
+            int cantToSelec = rnd.Next(0, hijo.Count - crossPoint); // number of items to select
 
 
             Console.WriteLine("\n\nPunto cruce: {0}   Cantidad: {1}", crossPoint, cantToSelec+"\n");
@@ -101,17 +91,23 @@ namespace GeneticCheduleGenerator
                 hija[i] = course;
             }
             comp++;
-            choques(crossPoint, cantToSelec, hijo, hija, ref asig, ref comp);
+            Crashes(crossPoint, cantToSelec, hijo, hija, asig, comp);
+            Console.WriteLine("\n--------------- Hijo 1 ---------------");
+            PrintList(hijo, "Hijo 1");
+            Console.WriteLine();
 
+            Console.WriteLine("\n--------------- Hijo 2 ---------------");
+            PrintList(hija, "Hijo 2");
         }
+
         /// <summary>
-        /// Fixed clashes produced by crossing chromosome segments
+        /// Fixed crashes produced by crossing chromosome segments
         /// </summary>
         /// <param name="croPo">Cross point</param>
         /// <param name="cant">Number of elements interchanged</param>
         /// <param name="hijo"></param>
         /// <param name="hija"></param>
-        public static void choques(int croPo, int cant, List<Course> hijo, List<Course> hija, ref int asig, ref int comp)
+        public static void Crashes(int croPo, int cant, List<Course> hijo, List<Course> hija, int asig, int comp)
         {
             bool parar;
             int vecesHijo = 0, vecesHija = 0; // cantidad de veces que aparece el obj
@@ -127,10 +123,14 @@ namespace GeneticCheduleGenerator
                 {
                     asig++;
                     comp += 5;
-                    if ((j >= croPo | j <= croPo + cant) & hijo[i].idCourse == hijo[j].idCourse)
+                    if (hijo[i] != null)
                     {
-                        vecesHijo++;
-                        asig++;
+                        comp += 4;
+                        if ((j >= croPo | j <= croPo + cant) & hijo[i].Equals(hijo[j]))
+                        {
+                            vecesHijo++;
+                            asig++;
+                        }
                     }
                 }
                 asig++;
@@ -138,10 +138,10 @@ namespace GeneticCheduleGenerator
                 {
                     asig++;
                     comp += 2;
-                    if (hijo[j] != null) // en caso de ser un espacio vacio
+                    if (hijo[i] != null) // en caso de ser un espacio vacio
                     {
                         comp += 4; ;
-                        if ((j < croPo | j > croPo + cant - 1) & hijo[i].idCourse == hijo[j].idCourse)   // si el elemento esta repetido pero es diferente al que se encuentra en la posicion i quiere decir que hay 
+                        if ((j < croPo | j > croPo + cant - 1) & hijo[i].Equals(hijo[j]))   // si el elemento esta repetido pero es diferente al que se encuentra en la posicion i quiere decir que hay 
                         {                                                               // mas de 1 y si hay mas de 1 de ese tipo de curso quiere decir que esta ahi por el cruce realizado
                             asig++;
                             vecesHijo++;
@@ -154,53 +154,57 @@ namespace GeneticCheduleGenerator
                                 {
                                     comp++;
                                     asig += 2;
-                                    for (int n = croPo; n < croPo + cant; n++) // cuento cuantas veces aparece el hijo de la posicion i en el segmento de cromosomas seleccionado
+                                    if (hija[o] != null)
                                     {
-                                        asig++;
-                                        comp+=5;
-                                        if ((n >= croPo | n <= croPo + cant) & hija[o].idCourse == hija[n].idCourse)
+                                        for (int n = croPo; n < croPo + cant; n++) // cuento cuantas veces aparece el hijo de la posicion i en el segmento de cromosomas seleccionado
                                         {
-                                            vecesHija++;
                                             asig++;
-                                        }                                            
-                                    }
-                                    comp++;
-                                    for (int n = 0; n < hija.Count; n++)
-                                    {
-                                        asig++;
-                                        comp += 2;
-                                        if (hija[n] != null) // en caso de ser un espacio vacio
-                                        {
-                                            comp += 4;
-                                            if ((n < croPo | n > croPo + cant - 1) & hija[o].idCourse == hija[n].idCourse)
+                                            comp += 5;
+                                            if ((n >= croPo | n <= croPo + cant) & hija[o].Equals(hija[n]))
                                             {
-                                                asig++;
                                                 vecesHija++;
-                                                comp++;
-                                                if (vecesHija > hija[o].lections)
-                                                {
-                                                    // HIJA[N] ES LA REPETIDA FUERA DEL SEGMENTO
-                                                    asig += 5;
-                                                    hijo[j] = hija[n];
-                                                    hija[n] = cursoRespaldo;
-                                                    Console.WriteLine("Intercambiando curso " + cursoRespaldo.idCourse + ", Padre 1 con curso " + hijo[j].idCourse + ", Padre 2");
-                                                    vecesHija = 0;
-                                                    parar = true;
-                                                    break;
-                                                }
+                                                asig++;
                                             }
                                         }
-                                    }// end for
-                                    asig++;
-                                    comp += 2;
-                                    vecesHija = 0;
-                                    if (parar)
-                                    {
+                                        comp++;
+                                        for (int n = 0; n < hija.Count; n++)
+                                        {
+                                            asig++;
+                                            comp += 2;
+                                            if (hija[n] != null) // en caso de ser un espacio vacio
+                                            {
+                                                comp += 4;
+                                                if ((n < croPo | n > croPo + cant - 1) & hija[o].Equals(hija[n]))
+                                                {
+                                                    asig++;
+                                                    vecesHija++;
+                                                    comp++;
+                                                    if (vecesHija > hija[o].lections)
+                                                    {
+                                                        // HIJA[N] ES LA REPETIDA FUERA DEL SEGMENTO
+                                                        asig += 5;
+                                                        hijo[j] = hija[n];
+                                                        hija[n] = cursoRespaldo;
+                                                        Console.WriteLine("Intercambiando curso " + cursoRespaldo.idCourse + ", Padre 1 con curso " + hijo[j].idCourse + ", Padre 2");
+                                                        vecesHija = 0;
+                                                        parar = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }// end for
                                         asig++;
-                                        break;
-                                    }                                        
-                                }// end for                
+                                        comp += 2;
+                                        vecesHija = 0;
+                                        if (parar)
+                                        {
+                                            asig++;
+                                            break;
+                                        }
+                                    }// end for    
+                                }            
                             }
+                            
                         }
                     }
                     comp++;
@@ -214,6 +218,177 @@ namespace GeneticCheduleGenerator
                 vecesHijo = 0;
                 asig++;
             }// end for   
+            comp++;
+        }
+        /// <summary>
+        /// Genetic Algorithm named Order One Crossover
+        /// </summary>
+        /// <param name="padre1"></param>
+        /// <param name="padre2"></param>
+        /// <param name="asig"></param>
+        /// <param name="comp"></param>
+        public static void OrderOneCrossover(List<Course> padre1, List<Course> padre2, int asig, int comp)
+        {
+            asig += 5;
+            List<Course> hijo1 = new List<Course>(padre1);
+            List<Course> hijo2 = new List<Course>(padre2);
+
+            Random rnd = new Random();
+            //FillSon(padre1, hijo1);
+
+            int crossPoint = rnd.Next(hijo1.Count-1);  // point to start to select elements of the mutation
+
+
+            while (crossPoint >= hijo1.Count)// el punto de cruce no puede quedar al final porque sino no puede seleccionar una subcadena y por ende no habria nada para intercambiar
+            {
+                comp++;
+                asig++;
+                crossPoint = rnd.Next(hijo1.Count);
+            }
+            comp++;
+
+            int cantToSelec = rnd.Next(1, hijo1.Count - crossPoint); // number of items to select
+
+            asig++;
+            for (int i = 0; i < padre1.Count; i++)
+            {
+                asig++;
+                comp += 4;
+                if (i < crossPoint | i >= crossPoint + cantToSelec)
+                {
+                    asig += 2;
+                    hijo1[i] = null;
+                    hijo2[i] = null;
+                }
+            }
+            comp++;
+
+            Console.WriteLine("\n\nPunto cruce: {0}   Cantidad: {1}", crossPoint, cantToSelec + "\n");
+
+            Console.WriteLine("\n--------------- Hijo 1 ---------------\n");
+            FillOX(crossPoint, cantToSelec, hijo1, padre2, asig, comp);
+            PrintList(hijo1, "Hijo 1");
+
+            Console.WriteLine("\n\nCantidad de asignaciones: {0}, cantidad de compraciones: {1}", asig, comp);
+
+            asig = 0;
+            comp = 0;
+
+            Console.WriteLine("\n--------------- Hijo 2 ---------------\n");
+            FillOX(crossPoint, cantToSelec, hijo2, padre1, asig, comp);                                    
+            PrintList(hijo2, "Hijo 2");
+
+            Console.WriteLine("\n\nCantidad de asignaciones: {0}, cantidad de compraciones: {1}", asig, comp);
+        }
+
+        public static void FillOX(int crossPo, int cantSelect, List<Course> hijo1, List<Course> hijo2, int asig, int comp)
+        {
+            bool esta = false;
+            int pos = crossPo + cantSelect, veces = 0;
+            asig += 4;
+            for (int i = crossPo + cantSelect; i < hijo2.Count; i++) // en hijo 2 para agregar a hijo 1 el elemento ubicado en i si ese elemento no esta dentro del segmento marcado
+            {
+                asig += 3;
+                comp++;
+                esta = false;
+                for (int j = crossPo; j < crossPo + cantSelect; j++)
+                {
+                    asig += 3;
+                    comp++;
+                    veces = 0;
+                    for (int h = crossPo; h < crossPo + cantSelect; h++)
+                    {
+                        asig++;
+                        comp += 2;
+                        if (hijo2[i] != null)
+                        {
+                            comp++;
+                            if (hijo2[i].Equals(hijo1[h]))
+                            {
+                                asig++;
+                                veces++;
+                            }
+                        }
+                    }
+                    comp += 2;
+                    if (hijo2[i] != null)
+                    {
+                        comp += 3;
+                        if (hijo2[i].Equals(hijo1[j]) & veces == hijo2[i].lections) // para descargar el elemento y no agregarlo...
+                        {
+                            asig+=2;
+                            esta = true;
+                            comp++;
+                            if (i == hijo2.Count - 1)
+                            {
+                                asig++;
+                                i = -1;
+                            }
+                            break;
+                        }
+                    }
+                }
+                comp += 2;
+                if (esta)
+                {
+                    asig++;
+                    continue;
+                }
+                else
+                {
+                    asig += 4;
+                    hijo1[pos] = hijo2[i];
+                    if (hijo2[i] != null)
+                        Console.WriteLine("Colocando curso #" + hijo2[i].idCourse + " en la posicion #" + pos);
+                    else
+                        Console.WriteLine("Colocando un espacio (null) en la posicion #" + pos);
+                    pos++;
+
+                    veces = 0;
+                    for (int m = 0; m < hijo1.Count; m++)
+                    {
+                        asig++;
+                        comp += 2;
+                        if (hijo2[i] != null)
+                        {
+                            comp++;
+                            if (hijo2[i].Equals(hijo1[m]))
+                            {
+                                asig++;
+                                veces++;
+                            }
+                        }
+                    }
+                    comp += 2;
+                    if (hijo2[i] != null)
+                    {
+                        comp++;
+                        if (veces > hijo2[i].lections)
+                        {
+                            asig++;
+                            pos--;
+                        }
+                    }
+                    comp++;
+                    if (pos == crossPo)
+                    {
+                        asig++;
+                        break;
+                    }
+                }
+                comp++;
+                if (i == hijo2.Count - 1)
+                {
+                    asig++;
+                    i = -1;
+                }
+                comp++;
+                if (pos == hijo2.Count)
+                {
+                    asig++;
+                    pos = 0;
+                }
+            }
             comp++;
         }
         /// <summary>
@@ -284,7 +459,7 @@ namespace GeneticCheduleGenerator
         /// </summary>
         /// <param name="initial"></param>
         /// <returns></returns>
-        public List<Course> prepareListForCreate(List<Course> initial)
+        public List<Course> PrepareListForCreate(List<Course> initial)
         {
             List<Course> response = new List<Course>();
             for (int i = 0; i < initial.Count; i++)
@@ -300,7 +475,7 @@ namespace GeneticCheduleGenerator
         /// Creates a three-dimensional array which will be a parent schedule
         /// </summary>
         /// <param name="seed">List with all courses to assign</param>
-        public void createParent(List<Course> seed)
+        public void CreateParent(List<Course> seed)
         {
             Random rand = new Random();
             while( seed.Count > 0)
