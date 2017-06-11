@@ -91,7 +91,7 @@ namespace GeneticCheduleGenerator
                     Console.Write(" " + list[i].idCourse);
             }
         }
-        
+                                                                                    
         /// <summary>
         /// Function that cross two parents and be obtained two son
         /// </summary>
@@ -248,9 +248,11 @@ namespace GeneticCheduleGenerator
         public void GeneticPMX(List<Course> hijo, List<Course> hija)
         {
             int comp = 0, asig = 0;
-            for (int i = 0; i < 10; i++) // cantidad de generaciones
+            for (int i = 0; i < 10000; i++) // cantidad de generaciones
             {
-               CrossWithPMX(hijo, hija, ref asig, ref comp);
+                //Schedule parent2 = new Schedule();
+                //List<Course> list = parent2.MatrixToList();
+                CrossWithPMX(hijo, hija, ref asig, ref comp);
                 Course[,,] hijom = ListToMatrixR(hijo);
                 Course[,,] hijam = ListToMatrixR(hija);
                 float aFit = getFitness(hijam);
@@ -267,11 +269,12 @@ namespace GeneticCheduleGenerator
                     best = Clone(hijom);
 
                 }
-
+                Console.WriteLine("Cantidad de Asignaciones: {0}, Cantidad de Comprobaciones: {1}",asig,comp);
+                comp = 0; asig = 0;
             }
 
-        }
 
+        }
 
 		public void GeneticOX(List<Course> hijo, List<Course> hija)
 		{
@@ -295,6 +298,8 @@ namespace GeneticCheduleGenerator
 					best = Clone(hijom);
 
 				}
+				Console.WriteLine("Cantidad de Asignaciones: {0}, Cantidad de Comprobaciones: {1}", asig, comp);
+				comp = 0; asig = 0;
 
 			}
 
@@ -888,14 +893,16 @@ namespace GeneticCheduleGenerator
             BrandAndBoundAux(seed, 0, 0, 0, ref asig, ref comp, ref iterations, ref bounds);
             Console.WriteLine("PODAS: "+bounds+ " Comparaciones: "+comp +" Asig: "+asig+"\n");
             Console.WriteLine("FITNESS:"+bestFit+"\n");
-            printSchedule(best);
 			long totalBytesOfMemoryUsed = currentProcess.WorkingSet64;
             Console.WriteLine("MEMORIA UTILIZADA: " + totalBytesOfMemoryUsed / 1048576.0);
         }
 
-		 
 
-        public static void Shuffle<Course>(List<Course> list)
+		/// <summary>
+		/// Receives a list and shuffles it.
+		/// </summary>
+		/// <param name="list">List to shuffle</param>
+		public static void Shuffle<Course>(List<Course> list)
 		{
             Random rng = new Random();
 			int n = list.Count;
@@ -908,5 +915,29 @@ namespace GeneticCheduleGenerator
 				list[n] = T;
 			}
 		}
+
+        public Tuple<Course[,,], Course[,,]> CreateAlternativeMatrixes()
+        {
+            Course[,,] professorMatrix = new Course[5, 4, DefaultData.professors.Count];
+            Course[,,] SemestersMatrix = new Course[5, 4, 5];
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    for (int a = 0; a < aulas; a++)
+                    {
+                        Course actual = best[i, j, a];
+                        if (actual != null)
+                        {
+                            actual.classroom = a;
+                            professorMatrix[i, j, actual.idProfessor.idProfessor - 1] = actual;
+                            SemestersMatrix[i, j, actual.semester - 1] = actual;
+                        }
+                    }
+                }
+            }
+            Tuple<Course[,,], Course[,,]> response = new Tuple<Course[,,], Course[,,]>(professorMatrix,SemestersMatrix);
+            return response;
+        }
     }
 }

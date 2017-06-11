@@ -9,6 +9,7 @@ namespace GeneticCheduleGenerator
         public Professor idProfessor; //{ get; set; }
         public int lections; //{ get; set; }
         public int groupe;
+        public int classroom = 0;
 
         public Course(string name, int idCourse, Professor profe, int groupe, int semester,int lections)
         {

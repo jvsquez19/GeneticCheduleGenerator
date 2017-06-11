@@ -14,8 +14,69 @@ namespace GeneticCheduleGenerator
         public static List<Course> madre = new List<Course>();
         public static List<Course> hijo;// = new List<Course>();
         public static List<Course> hija;
-        public static List<Course> bestSon;
-        float bestFitness = 0;
+
+
+		public static void printProfessorsSchedule(Course[,,] matrix)
+		{
+			String[] days = new string[] { "lunes", "martes", "miercoles", "jueves", "viernes" };
+			String[] hours = new string[] { "\n7:00 a 9:15", "\n9:15 a 11:30", "\n12:30 a 2:45", "\n2:45 a 4:30" };
+			Console.WriteLine("IMPRIMIENDO HORARIOS POR PROFESOR");
+			for (int professor = 0; professor < DefaultData.professors.Count; professor++)
+			{
+                Console.WriteLine(" Profesor: " + DefaultData.professors[professor].name);
+				for (int i = 0; i < 5; i++)
+				{
+					Console.WriteLine("\n" + days[i]);
+					for (int j = 0; j < 4; j++)
+					{
+						Course actual = matrix[i, j, professor];
+                        if (actual != null)
+                        {
+                            Console.WriteLine("\n" + hours[j] + ": " + actual.name + ", Grupo" + actual.groupe + " Aula: " + actual.classroom);
+                        }
+					}
+
+				}
+
+			}
+		}
+
+        public static void printSemesterSchedule(Course[,,] matrix)
+		{
+			String[] semesters = new string[] { "Primer", "Segundo", "Tercer", "Cuarto", "Quinto" };
+			String[] days = new string[] { "lunes", "martes", "miercoles", "jueves", "viernes" };
+			String[] hours = new string[] { "\n7:00 a 9:15", "\n9:15 a 11:30", "\n12:30 a 2:45", "\n2:45 a 4:30" };
+			Console.WriteLine("IMPRIMIENDO HORARIOS POR SEMESTRE");
+			for (int semester = 0; semester < 5; semester++)
+			{
+				Console.WriteLine(semesters[semester] + " Semestre");
+				for (int i = 0; i < 5; i++)
+				{
+					Console.WriteLine("\n" + days[i]);
+					for (int j = 0; j < 4; j++)
+					{
+                        Course actual = matrix[i, j, semester];
+                        if (actual != null)
+                        {
+                            
+                            Console.WriteLine("\n" + hours[j] + ": " + actual.name + ", Grupo" + actual.groupe + " Aula: " + actual.classroom);
+                        }
+					}
+
+				}
+
+			}
+		}
+
+		public static void printAll(Schedule basic)
+		{
+			Tuple<Course[,,], Course[,,]> aux = basic.CreateAlternativeMatrixes();
+			Course[,,] matrixProfessors = aux.Item1;
+			Course[,,] matrixSemesters = aux.Item2;
+			Schedule.printSchedule(basic.best);
+			printProfessorsSchedule(matrixProfessors);
+			printSemesterSchedule(matrixSemesters);
+		}
 
         public static void Main(string[] args)
         {
@@ -101,18 +162,42 @@ namespace GeneticCheduleGenerator
             parent2.Mutations();
             Schedule.printSchedule(parent2.matrix);
             */
+
             DefaultData.InsertDefaultData();
             Schedule parent1 = new Schedule();
             Schedule parent2 = new Schedule();
             hijo = parent1.MatrixToList();
             hija = parent2.MatrixToList();
 
+            Schedule.PrintList(hijo,"Padre 1: ");
+            Console.WriteLine();
+            Schedule.PrintList(hija, "Padre 2: ");
+
             Console.WriteLine("FIT: "+parent1.getFitness());
+
             parent1.GeneticPMX(hijo,hija);
-            Schedule.printSchedule(parent1.best);
+
+            Schedule.PrintList(hijo,"Padre 1: ");
+            Console.WriteLine();
+            Schedule.PrintList(hija, "Padre 2: ");
+
+            //printAll(parent1);
             Console.WriteLine("FIT: " + parent1.getFitness());
 
+            printAll(parent1);
 
+			hijo = parent1.MatrixToList();
+			hija = parent2.MatrixToList();
+
+			Console.WriteLine("FIT: " + parent1.getFitness());
+
+            parent1.GeneticOX(hijo, hija);
+
+			printAll(parent1);
+			Console.WriteLine("FIT: " + parent1.getFitness());
+
+            parent1.BrandAndBound();
+            printAll(parent1);
             
             Console.ReadKey();            
         }

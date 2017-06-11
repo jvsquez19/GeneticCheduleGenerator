@@ -52,7 +52,7 @@ namespace GeneticCheduleGenerator
             Course c12 = new Course("Taller de programacion", 12, p2, 51,1,2);
 
             //semestre 2
-            Course c13 = new Course("Ambiente humano", 13, p11, 50,1,1);
+            Course c13 = new Course("Ambiente humano", 13, p11, 50,2,1);
             Course c14 = new Course("Programacion Orientada a Objetos", 14, p7, 50,2,1);
             Course c15 = new Course("Estructura de datos", 15, p12, 50,2,1);
             Course c16 = new Course("Calculo para computacion", 16, p6, 50,2,2);
@@ -76,10 +76,10 @@ namespace GeneticCheduleGenerator
             Course c30 = new Course("Probabilidades", 30, p9, 50,4,2);
 
             //semestre 5
-            Course c31 = new Course("Filosoficos", 31, p11, 50,4,1);
-            Course c32 = new Course("Administracion de proyectos", 32, p13, 50,4,1);
-            Course c33 = new Course("Compiladores e interpretes", 33, p12, 50,4,2);
-            Course c34 = new Course("Diseño de software", 34, p8, 50,4,2);
+            Course c31 = new Course("Filosoficos", 31, p11, 50,5,1);
+            Course c32 = new Course("Administracion de proyectos", 32, p13, 50,5,1);
+            Course c33 = new Course("Compiladores e interpretes", 33, p12, 50,5,2);
+            Course c34 = new Course("Diseño de software", 34, p8, 50,5,2);
             courses = new List<Course> { c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20,
                 c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33, c34 };
         }            
